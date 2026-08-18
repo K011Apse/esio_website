@@ -34,6 +34,11 @@
             --footer-bg: rgba(255, 255, 255, 0.5);
             --backdrop-blur: blur(8px);
             --backdrop-blur-footer: blur(4px);
+            --dropdown-bg: #ffffff;
+            --dropdown-text: #1a202c;
+            --dropdown-hover: #f0f4ff;
+            --switch-bg: #cbd5e0;
+            --switch-dot: #ffffff;
         }
 
         /* ===== 深色主题 ===== */
@@ -65,6 +70,11 @@
             --footer-bg: rgba(18, 18, 18, 0.6);
             --backdrop-blur: blur(10px);
             --backdrop-blur-footer: blur(6px);
+            --dropdown-bg: #2d3748;
+            --dropdown-text: #f0f4f8;
+            --dropdown-hover: #3a4a5f;
+            --switch-bg: #4a5568;
+            --switch-dot: #e2e8f0;
         }
 
         /* ===== 全局重置 ===== */
@@ -162,53 +172,180 @@
             border-bottom-color: var(--accent);
         }
 
-        /* 深色模式切换按钮 */
-        .theme-toggle {
+        /* ===== 设置下拉菜单 (右上角) ===== */
+        .settings-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .settings-btn {
             background: none;
             border: none;
             cursor: pointer;
-            padding: 4px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            padding: 4px 10px;
+            border-radius: 6px;
+            transition: background-color 0.25s ease, color 0.25s ease;
             display: flex;
             align-items: center;
-            justify-content: center;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            color: var(--text-muted);
-            transition: background-color 0.25s ease, color 0.25s ease, transform 0.2s ease;
-            background-color: var(--bg-contact);
-            border: 1px solid var(--border-contact);
+            gap: 4px;
         }
 
-        .theme-toggle:hover {
-            background-color: var(--bg-contact-hover);
+        .settings-btn:hover {
             color: var(--accent);
-            transform: rotate(15deg);
+            background-color: var(--bg-contact);
         }
 
-        .theme-toggle svg {
-            width: 20px;
-            height: 20px;
-            fill: none;
+        .settings-btn svg {
+            width: 18px;
+            height: 18px;
             stroke: currentColor;
+            fill: none;
             stroke-width: 2;
             stroke-linecap: round;
             stroke-linejoin: round;
-            transition: stroke 0.3s ease;
         }
 
-        .theme-toggle .sun-icon {
-            display: block;
-        }
-        .theme-toggle .moon-icon {
+        .settings-dropdown {
             display: none;
+            position: absolute;
+            right: 0;
+            top: calc(100% + 8px);
+            background-color: var(--dropdown-bg);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 12px 0;
+            min-width: 210px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+            transition: background-color 0.3s ease, border-color 0.3s ease;
         }
 
-        [data-theme="dark"] .theme-toggle .sun-icon {
-            display: none;
-        }
-        [data-theme="dark"] .theme-toggle .moon-icon {
+        .settings-dropdown.open {
             display: block;
+            animation: fadeSlideDown 0.2s ease forwards;
+        }
+
+        @keyframes fadeSlideDown {
+            0% {
+                opacity: 0;
+                transform: translateY(-6px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .settings-dropdown .dropdown-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 16px;
+            color: var(--dropdown-text);
+            font-size: 0.9rem;
+            transition: background-color 0.2s ease;
+            gap: 20px;
+        }
+
+        .settings-dropdown .dropdown-item:hover {
+            background-color: var(--dropdown-hover);
+        }
+
+        .settings-dropdown .dropdown-item .item-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 450;
+        }
+
+        .settings-dropdown .dropdown-item .item-label svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            opacity: 0.7;
+        }
+
+        /* 语言选择器 (按钮组) */
+        .lang-group {
+            display: flex;
+            gap: 4px;
+            background-color: var(--bg-contact);
+            border-radius: 6px;
+            padding: 2px;
+        }
+
+        .lang-group button {
+            background: none;
+            border: none;
+            padding: 4px 10px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .lang-group button.active {
+            background-color: var(--accent);
+            color: #ffffff;
+        }
+
+        .lang-group button:hover:not(.active) {
+            background-color: var(--bg-contact-hover);
+        }
+
+        /* 开关 (Toggle Switch) */
+        .switch {
+            position: relative;
+            width: 40px;
+            height: 22px;
+            flex-shrink: 0;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .switch .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--switch-bg);
+            border-radius: 34px;
+            transition: background-color 0.3s ease;
+        }
+
+        .switch .slider::before {
+            content: "";
+            position: absolute;
+            height: 16px;
+            width: 16px;
+            left: 3px;
+            bottom: 3px;
+            background-color: var(--switch-dot);
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+
+        .switch input:checked+.slider {
+            background-color: var(--accent);
+        }
+
+        .switch input:checked+.slider::before {
+            transform: translateX(18px);
         }
 
         /* 移动端菜单切换按钮 */
@@ -253,7 +390,6 @@
             box-shadow: var(--shadow-card-hover);
         }
 
-        /* 工作室名称（头像已删除，调整上边距） */
         .org-name {
             font-size: 2.2rem;
             font-weight: 700;
@@ -274,7 +410,6 @@
             color: var(--text-muted);
         }
 
-        /* 一句话简介 */
         .tagline {
             font-size: 1.15rem;
             font-weight: 400;
@@ -284,7 +419,6 @@
             transition: color 0.3s ease;
         }
 
-        /* 分隔装饰 */
         .divider {
             width: 48px;
             height: 3px;
@@ -294,7 +428,6 @@
             transition: background 0.3s ease;
         }
 
-        /* 联系方式 */
         .contact-item {
             display: inline-flex;
             align-items: center;
@@ -515,11 +648,16 @@
             }
 
             .nav-menu {
-                gap: 20px;
+                gap: 16px;
             }
 
             .nav-menu a {
                 font-size: 0.9rem;
+            }
+
+            .settings-btn {
+                font-size: 0.9rem;
+                padding: 4px 8px;
             }
 
             .hero {
@@ -561,7 +699,7 @@
             }
 
             .nav-actions {
-                gap: 10px;
+                gap: 8px;
             }
 
             .nav-toggle {
@@ -592,6 +730,27 @@
             .nav-menu a.active {
                 border-bottom: none;
                 color: var(--accent);
+            }
+
+            .settings-wrapper {
+                position: relative;
+            }
+
+            .settings-btn {
+                font-size: 0.9rem;
+                padding: 4px 8px;
+            }
+
+            .settings-dropdown {
+                position: absolute;
+                right: 0;
+                top: calc(100% + 4px);
+                min-width: 200px;
+                box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            }
+
+            .settings-dropdown .dropdown-item {
+                padding: 10px 14px;
             }
 
             .hero {
@@ -684,24 +843,50 @@
             <div class="nav-brand">ESI<span>.</span></div>
 
             <div class="nav-actions">
-                <!-- 深色模式切换按钮 -->
-                <button class="theme-toggle" id="themeToggle" aria-label="切换深色/浅色模式">
-                    <svg class="sun-icon" viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="5" />
-                        <line x1="12" y1="1" x2="12" y2="3" />
-                        <line x1="12" y1="21" x2="12" y2="23" />
-                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-                        <line x1="1" y1="12" x2="3" y2="12" />
-                        <line x1="21" y1="12" x2="23" y2="12" />
-                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-                    </svg>
-                    <svg class="moon-icon" viewBox="0 0 24 24">
-                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-                    </svg>
-                </button>
+                <!-- 设置下拉菜单 (右上角) -->
+                <div class="settings-wrapper" id="settingsWrapper">
+                    <button class="settings-btn" id="settingsToggle" aria-label="打开设置" aria-expanded="false">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                            <circle cx="12" cy="12" r="3" />
+                        </svg>
+                        设置
+                    </button>
 
+                    <div class="settings-dropdown" id="settingsDropdown">
+                        <!-- 语言 -->
+                        <div class="dropdown-item">
+                            <span class="item-label">
+                                <svg viewBox="0 0 24 24">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <line x1="2" y1="12" x2="22" y2="12" />
+                                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                                </svg>
+                                语言
+                            </span>
+                            <div class="lang-group" id="langGroup">
+                                <button class="active" data-lang="zh">中文</button>
+                                <button data-lang="en">English</button>
+                            </div>
+                        </div>
+
+                        <!-- 深色模式开关 -->
+                        <div class="dropdown-item">
+                            <span class="item-label">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                                </svg>
+                                深色模式
+                            </span>
+                            <label class="switch">
+                                <input type="checkbox" id="darkModeSwitch" />
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 移动端菜单按钮 -->
                 <button class="nav-toggle" id="navToggle" aria-label="切换菜单" aria-expanded="false">
                     <span></span>
                     <span></span>
@@ -723,7 +908,6 @@
 
             <div class="hero" id="heroCard">
 
-                <!-- 头像已删除，直接显示名称 -->
                 <h1 class="org-name">
                     <span class="highlight">ESI</span>
                     <span class="paren">(</span>Earth Science Information Organization<span class="paren">)</span>
@@ -769,7 +953,7 @@
                         </p>
                         <p>
                             我们相信，地球科学的数据蕴含着巨大的价值，而好的信息设计
-                            能让这些数据真正“开口说话”。我们的工作涵盖：
+                            能让这些数据真正"开口说话"。我们的工作涵盖：
                         </p>
                         <ul>
                             <li>基础化学研究与药剂研发</li>
@@ -800,7 +984,7 @@
                             </div>
                             <div class="row">
                                 <span class="label">📍 地址</span>
-                                <span class="value">中国 · 杭州 </span>
+                                <span class="value">中国 · 杭州</span>
                             </div>
                             <div class="row" style="border-bottom:none;padding-bottom:4px;">
                                 <span class="label">🕐 响应</span>
@@ -840,137 +1024,3 @@
 
             // ---------- DOM 引用 ----------
             const navToggle = document.getElementById('navToggle');
-            const navMenu = document.getElementById('navMenu');
-            const navLinks = document.querySelectorAll('.nav-menu a');
-            const themeToggle = document.getElementById('themeToggle');
-            const sections = {
-                home: document.getElementById('section-home'),
-                about: document.getElementById('section-about'),
-                contact: document.getElementById('section-contact'),
-            };
-
-            let currentSection = 'home';
-
-            // ---------- 深色模式 ----------
-            const STORAGE_KEY = 'esi-theme';
-
-            function getPreferredTheme() {
-                const stored = localStorage.getItem(STORAGE_KEY);
-                if (stored === 'dark' || stored === 'light') return stored;
-                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-            }
-
-            function setTheme(theme) {
-                document.documentElement.setAttribute('data-theme', theme);
-                localStorage.setItem(STORAGE_KEY, theme);
-                themeToggle.setAttribute('aria-label', theme === 'dark' ? '切换到浅色模式' : '切换到深色模式');
-            }
-
-            function toggleTheme() {
-                const current = document.documentElement.getAttribute('data-theme');
-                const next = current === 'dark' ? 'light' : 'dark';
-                setTheme(next);
-            }
-
-            const initialTheme = getPreferredTheme();
-            setTheme(initialTheme);
-
-            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-            const handleSystemChange = (e) => {
-                if (!localStorage.getItem(STORAGE_KEY)) {
-                    setTheme(e.matches ? 'dark' : 'light');
-                }
-            };
-            mediaQuery.addEventListener('change', handleSystemChange);
-
-            themeToggle.addEventListener('click', toggleTheme);
-
-            // ---------- 移动端菜单 ----------
-            function toggleMobileMenu() {
-                const isOpen = navMenu.classList.toggle('open');
-                navToggle.setAttribute('aria-expanded', isOpen);
-            }
-
-            navToggle.addEventListener('click', toggleMobileMenu);
-
-            navLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    if (navMenu.classList.contains('open')) {
-                        navMenu.classList.remove('open');
-                        navToggle.setAttribute('aria-expanded', 'false');
-                    }
-                });
-            });
-
-            // ---------- 导航切换内容 ----------
-            function switchSection(sectionId) {
-                if (sectionId === currentSection) return;
-
-                Object.values(sections).forEach(el => {
-                    if (el) el.classList.remove('active');
-                });
-
-                const target = sections[sectionId];
-                if (target) {
-                    target.classList.add('active');
-                }
-
-                navLinks.forEach(link => {
-                    link.classList.remove('active');
-                    const dataSection = link.getAttribute('data-section');
-                    if (dataSection === sectionId) {
-                        link.classList.add('active');
-                    }
-                });
-
-                currentSection = sectionId;
-
-                const hero = document.getElementById('heroCard');
-                if (hero) {
-                    const rect = hero.getBoundingClientRect();
-                    if (rect.top < 0 || rect.top > window.innerHeight * 0.6) {
-                        hero.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
-                }
-            }
-
-            navLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const section = this.getAttribute('data-section');
-                    if (section) {
-                        switchSection(section);
-                    }
-                });
-            });
-
-            const brand = document.querySelector('.nav-brand');
-            if (brand) {
-                brand.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    switchSection('home');
-                    if (navMenu.classList.contains('open')) {
-                        navMenu.classList.remove('open');
-                        navToggle.setAttribute('aria-expanded', 'false');
-                    }
-                });
-            }
-
-            let resizeTimer;
-            window.addEventListener('resize', function() {
-                clearTimeout(resizeTimer);
-                resizeTimer = setTimeout(() => {
-                    if (window.innerWidth > 480 && navMenu.classList.contains('open')) {
-                        navMenu.classList.remove('open');
-                        navToggle.setAttribute('aria-expanded', 'false');
-                    }
-                }, 200);
-            });
-
-            switchSection('home');
-            console.log('✅ ESI 工作室页面已加载 (邮箱已更新)');
-        })();
-    </script>
-
-</body>
-</html>
