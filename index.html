@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ESI · 地球科学信息组织</title>
+    <style>
+        /* ===== CSS 变量 — 浅色主题 (默认) ===== */
+        :root {
+            --bg-body: #f8fafc;
+            --bg-navbar: rgba(255, 255, 255, 0.7);
+            --bg-card: #ffffff;
+            --bg-card-hover: #ffffff;
+            --bg-contact: #f7fafc;
+            --bg-contact-hover: #edf2f7;
+            --bg-avatar: #edf2f7;
+            --text-primary: #1a202c;
+            --text-secondary: #2d3748;
+            --text-muted: #4a5568;
+            --text-light: #a0aec0;
+            --text-footer: #a0aec0;
+            --border-light: rgba(0, 0, 0, 0.04);
+            --border-contact: rgba(74, 144, 217, 0.08);
+            --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.03), 0 1px 4px rgba(0, 0, 0, 0.02);
+            --shadow-card-hover: 0 8px 40px rgba(0, 0, 0, 0.05);
+            --shadow-avatar: 0 4px 16px rgba(74, 144, 217, 0.10);
+            --shadow-avatar-hover: 0 6px 24px rgba(74, 144, 217, 0.18);
+            --accent: #4A90D9;
+            --accent-light: #7BA9F0;
+            --accent-gradient: linear-gradient(90deg, #4A90D9, #7BA9F0);
+            --divider-bg: linear-gradient(90deg, #4A90D9, #7BA9F0);
+            --nav-border-bottom: 2px solid transparent;
+            --nav-border-hover: 2px solid #4A90D9;
+            --footer-bg: rgba(255, 255, 255, 0.5);
+            --backdrop-blur: blur(8px);
+            --backdrop-blur-footer: blur(4px);
+        }
+
+        /* ===== 深色主题 ===== */
+        [data-theme="dark"] {
+            --bg-body: #121212;
+            --bg-navbar: rgba(18, 18, 18, 0.85);
+            --bg-card: #1e1e1e;
+            --bg-card-hover: #252525;
+            --bg-contact: #2a2a2a;
+            --bg-contact-hover: #333333;
+            --bg-avatar: #2d3748;
+            --text-primary: #f0f4f8;
+            --text-secondary: #e2e8f0;
+            --text-muted: #b0c4de;
+            --text-light: #8a9bb5;
+            --text-footer: #6b7a93;
+            --border-light: rgba(255, 255, 255, 0.06);
+            --border-contact: rgba(74, 144, 217, 0.20);
+            --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4), 0 1px 4px rgba(0, 0, 0, 0.3);
+            --shadow-card-hover: 0 8px 40px rgba(0, 0, 0, 0.6);
+            --shadow-avatar: 0 4px 16px rgba(74, 144, 217, 0.25);
+            --shadow-avatar-hover: 0 6px 24px rgba(74, 144, 217, 0.35);
+            --accent: #5B8DEF;
+            --accent-light: #8BB4F5;
+            --accent-gradient: linear-gradient(90deg, #5B8DEF, #8BB4F5);
+            --divider-bg: linear-gradient(90deg, #5B8DEF, #8BB4F5);
+            --nav-border-bottom: 2px solid transparent;
+            --nav-border-hover: 2px solid #5B8DEF;
+            --footer-bg: rgba(18, 18, 18, 0.6);
+            --backdrop-blur: blur(10px);
+            --backdrop-blur-footer: blur(6px);
+        }
+
+        /* ===== 全局重置 ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-secondary);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: color 0.2s ease;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        .container {
+            max-width: 1024px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* ===== 导航栏 ===== */
+        .navbar {
+            padding: 20px 0 16px;
+            border-bottom: 1px solid var(--border-light);
+            background-color: var(--bg-navbar);
+            backdrop-filter: var(--backdrop-blur);
+            -webkit-backdrop-filter: var(--backdrop-blur);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .navbar .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .nav-brand {
+            font-weight: 600;
+            font-size: 1.2rem;
+            letter-spacing: -0.3px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .nav-brand span {
+            color: var(--accent);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+        }
+
+        .nav-menu a {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            padding: 4px 0;
+            border-bottom: var(--nav-border-bottom);
+            transition: border-color 0.25s ease, color 0.25s ease;
+        }
+
+        .nav-menu a:hover,
+        .nav-menu a.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        /* 深色模式切换按钮 */
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            color: var(--text-muted);
+            transition: background-color 0.25s ease, color 0.25s ease, transform 0.2s ease;
+            background-color: var(--bg-contact);
+            border: 1px solid var(--border-contact);
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--bg-contact-hover);
+            color: var(--accent);
+            transform: rotate(15deg);
+        }
+
+        .theme-toggle svg {
+            width: 20px;
+            height: 20px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: stroke 0.3s ease;
+        }
+
+        .theme-toggle .sun-icon {
+            display: block;
+        }
+        .theme-toggle .moon-icon {
+            display: none;
+        }
+
+        [data-theme="dark"] .theme-toggle .sun-icon {
+            display: none;
+        }
+        [data-theme="dark"] .theme-toggle .moon-icon {
+            display: block;
+        }
+
+        /* 移动端菜单切换按钮 */
+        .nav-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .nav-toggle span {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background-color: var(--text-secondary);
+            border-radius: 2px;
+            transition: 0.25s ease;
+        }
+
+        /* ===== 主内容区 ===== */
+        main {
+            flex: 1;
+            padding: 60px 0 48px;
+        }
+
+        /* ===== Hero / 简介卡片 ===== */
+        .hero {
+            background-color: var(--bg-card);
+            border-radius: 24px;
+            padding: 48px 40px 44px;
+            box-shadow: var(--shadow-card);
+            text-align: center;
+            max-width: 720px;
+            margin: 0 auto;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+        }
+
+        .hero:hover {
+            box-shadow: var(--shadow-card-hover);
+        }
+
+        /* 工作室名称（头像已删除，调整上边距） */
+        .org-name {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            line-height: 1.2;
+            transition: color 0.3s ease;
+            margin-top: 4px;
+        }
+
+        .org-name .highlight {
+            color: var(--accent);
+        }
+
+        .org-name .paren {
+            font-weight: 400;
+            color: var(--text-muted);
+        }
+
+        /* 一句话简介 */
+        .tagline {
+            font-size: 1.15rem;
+            font-weight: 400;
+            color: var(--text-muted);
+            margin-bottom: 28px;
+            letter-spacing: 0.2px;
+            transition: color 0.3s ease;
+        }
+
+        /* 分隔装饰 */
+        .divider {
+            width: 48px;
+            height: 3px;
+            background: var(--divider-bg);
+            border-radius: 4px;
+            margin: 0 auto 28px;
+            transition: background 0.3s ease;
+        }
+
+        /* 联系方式 */
+        .contact-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+            color: var(--text-secondary);
+            background-color: var(--bg-contact);
+            padding: 10px 24px;
+            border-radius: 40px;
+            transition: background-color 0.25s ease, box-shadow 0.25s ease, color 0.3s ease, border-color 0.3s ease;
+            border: 1px solid var(--border-contact);
+        }
+
+        .contact-item:hover {
+            background-color: var(--bg-contact-hover);
+            box-shadow: 0 2px 12px rgba(74, 144, 217, 0.06);
+        }
+
+        .contact-item .icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            color: var(--accent);
+            transition: color 0.3s ease;
+        }
+
+        .contact-item .icon svg {
+            width: 20px;
+            height: 20px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .contact-item .label {
+            font-weight: 500;
+            color: var(--text-muted);
+            transition: color 0.3s ease;
+        }
+
+        .contact-item .email-link {
+            color: var(--accent);
+            font-weight: 500;
+            border-bottom: 1px dashed rgba(74, 144, 217, 0.25);
+            transition: border-color 0.2s ease, color 0.3s ease;
+        }
+
+        .contact-item .email-link:hover {
+            border-bottom-color: var(--accent);
+        }
+
+        /* 内容区 */
+        .content-section {
+            display: none;
+            margin-top: 40px;
+            padding-top: 32px;
+            border-top: 1px solid var(--border-light);
+            text-align: left;
+            max-width: 640px;
+            margin-left: auto;
+            margin-right: auto;
+            transition: border-color 0.3s ease;
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeSlideIn 0.35s ease forwards;
+        }
+
+        @keyframes fadeSlideIn {
+            0% {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .content-section h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            letter-spacing: -0.3px;
+            transition: color 0.3s ease;
+        }
+
+        .content-section h2 .accent {
+            color: var(--accent);
+        }
+
+        .content-section p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            line-height: 1.8;
+            margin-bottom: 12px;
+            transition: color 0.3s ease;
+        }
+
+        .content-section p:last-child {
+            margin-bottom: 0;
+        }
+
+        .content-section ul {
+            padding-left: 20px;
+            margin: 8px 0 12px;
+        }
+
+        .content-section ul li {
+            list-style: disc;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 4px;
+            transition: color 0.3s ease;
+        }
+
+        .content-section .contact-detail {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .content-section .contact-detail .row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.98rem;
+            color: var(--text-secondary);
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-light);
+            transition: color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .content-section .contact-detail .row .label {
+            font-weight: 500;
+            color: var(--text-muted);
+            min-width: 72px;
+            transition: color 0.3s ease;
+        }
+
+        .content-section .contact-detail .row .value {
+            color: var(--text-secondary);
+            transition: color 0.3s ease;
+        }
+
+        .content-section .contact-detail .row .value a {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .content-section .contact-detail .row .value a:hover {
+            text-decoration: underline;
+        }
+
+        /* ===== 页脚 ===== */
+        .footer {
+            margin-top: 48px;
+            padding: 28px 0 32px;
+            border-top: 1px solid var(--border-light);
+            text-align: center;
+            color: var(--text-footer);
+            font-size: 0.9rem;
+            letter-spacing: 0.2px;
+            background-color: var(--footer-bg);
+            backdrop-filter: var(--backdrop-blur-footer);
+            -webkit-backdrop-filter: var(--backdrop-blur-footer);
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+        }
+
+        .footer .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .footer .copyright {
+            color: var(--text-footer);
+            transition: color 0.3s ease;
+        }
+
+        .footer .copyright span {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .footer .footer-links {
+            display: flex;
+            gap: 20px;
+            margin-top: 6px;
+        }
+
+        .footer .footer-links a {
+            color: var(--text-footer);
+            font-size: 0.85rem;
+            transition: color 0.2s ease;
+        }
+
+        .footer .footer-links a:hover {
+            color: var(--accent);
+        }
+
+        /* ===== 响应式设计 ===== */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 16px 0 14px;
+            }
+
+            .nav-brand {
+                font-size: 1rem;
+            }
+
+            .nav-menu {
+                gap: 20px;
+            }
+
+            .nav-menu a {
+                font-size: 0.9rem;
+            }
+
+            .hero {
+                padding: 36px 24px 32px;
+                border-radius: 20px;
+            }
+
+            .org-name {
+                font-size: 1.7rem;
+                margin-top: 2px;
+            }
+
+            .tagline {
+                font-size: 1rem;
+            }
+
+            .contact-item {
+                padding: 8px 18px;
+                font-size: 0.92rem;
+            }
+
+            .content-section {
+                padding-top: 24px;
+                margin-top: 32px;
+            }
+
+            .content-section h2 {
+                font-size: 1.3rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 16px;
+            }
+
+            .navbar .container {
+                flex-wrap: wrap;
+            }
+
+            .nav-actions {
+                gap: 10px;
+            }
+
+            .nav-toggle {
+                display: flex;
+            }
+
+            .nav-menu {
+                display: none;
+                flex-direction: column;
+                align-items: flex-start;
+                width: 100%;
+                gap: 12px;
+                padding: 16px 0 8px;
+                border-top: 1px solid var(--border-light);
+            }
+
+            .nav-menu.open {
+                display: flex;
+            }
+
+            .nav-menu a {
+                font-size: 1rem;
+                padding: 6px 0;
+                border-bottom: none;
+            }
+
+            .nav-menu a:hover,
+            .nav-menu a.active {
+                border-bottom: none;
+                color: var(--accent);
+            }
+
+            .hero {
+                padding: 28px 16px 24px;
+                border-radius: 16px;
+            }
+
+            .org-name {
+                font-size: 1.4rem;
+                margin-top: 0;
+            }
+
+            .tagline {
+                font-size: 0.95rem;
+                margin-bottom: 20px;
+            }
+
+            .divider {
+                width: 36px;
+                margin-bottom: 20px;
+            }
+
+            .contact-item {
+                padding: 6px 16px;
+                font-size: 0.85rem;
+                gap: 8px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .contact-item .icon svg {
+                width: 18px;
+                height: 18px;
+            }
+
+            .content-section {
+                padding-top: 20px;
+                margin-top: 24px;
+            }
+
+            .content-section h2 {
+                font-size: 1.15rem;
+            }
+
+            .content-section .contact-detail .row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 2px;
+                padding: 10px 0;
+            }
+
+            .content-section .contact-detail .row .label {
+                min-width: auto;
+                font-size: 0.85rem;
+            }
+
+            .footer {
+                padding: 20px 0 24px;
+                font-size: 0.8rem;
+            }
+
+            .footer .footer-links {
+                gap: 14px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .org-name {
+                font-size: 1.2rem;
+            }
+
+            .hero {
+                padding: 20px 12px 18px;
+            }
+
+            .contact-item {
+                padding: 4px 12px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== 导航栏 ===== -->
+    <header class="navbar" role="navigation">
+        <div class="container">
+            <div class="nav-brand">ESI<span>.</span></div>
+
+            <div class="nav-actions">
+                <!-- 深色模式切换按钮 -->
+                <button class="theme-toggle" id="themeToggle" aria-label="切换深色/浅色模式">
+                    <svg class="sun-icon" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="5" />
+                        <line x1="12" y1="1" x2="12" y2="3" />
+                        <line x1="12" y1="21" x2="12" y2="23" />
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                        <line x1="1" y1="12" x2="3" y2="12" />
+                        <line x1="21" y1="12" x2="23" y2="12" />
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                    </svg>
+                    <svg class="moon-icon" viewBox="0 0 24 24">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                    </svg>
+                </button>
+
+                <button class="nav-toggle" id="navToggle" aria-label="切换菜单" aria-expanded="false">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="#" class="active" data-section="home">首页</a></li>
+                <li><a href="#" data-section="about">关于我们</a></li>
+                <li><a href="#" data-section="contact">联系我们</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <!-- ===== 主内容 ===== -->
+    <main>
+        <div class="container">
+
+            <div class="hero" id="heroCard">
+
+                <!-- 头像已删除，直接显示名称 -->
+                <h1 class="org-name">
+                    <span class="highlight">ESI</span>
+                    <span class="paren">(</span>Earth Science Information Organization<span class="paren">)</span>
+                </h1>
+
+                <p class="tagline">🌍 欢迎访问 ESI</p>
+
+                <div class="divider"></div>
+
+                <div class="contact-item">
+                    <span class="icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                            <polyline points="22,6 12,13 2,6" />
+                        </svg>
+                    </span>
+                    <span class="label">邮箱</span>
+                    <a href="#" class="email-link">esio2026@outlook.com</a>
+                </div>
+
+                <div id="contentArea">
+
+                    <div class="content-section active" id="section-home">
+                        <h2>👋 您好，我们是 <span class="accent">ESI</span></h2>
+                        <p>
+                            <strong>地球科学信息组织 (ESI)</strong> 是一个专注于地球科学领域
+                            数据整合、信息可视化与知识传播的独立工作室。
+                        </p>
+                        <p>
+                            我们致力于将复杂的地球科学数据转化为清晰、可交互的视觉信息，
+                            帮助研究者、决策者和公众更好地理解我们赖以生存的星球。
+                        </p>
+                        <p style="color:var(--text-muted);font-size:0.95rem;margin-top:8px;">
+                            —— 以信息之力，解地球之秘。
+                        </p>
+                    </div>
+
+                    <div class="content-section" id="section-about">
+                        <h2>📖 关于 <span class="accent">ESI</span></h2>
+                        <p>
+                            ESI 成立于 2020 年，由一群来自地球物理、地理信息科学和
+                            数据可视化领域的年轻研究者共同发起。
+                        </p>
+                        <p>
+                            我们相信，地球科学的数据蕴含着巨大的价值，而好的信息设计
+                            能让这些数据真正“开口说话”。我们的工作涵盖：
+                        </p>
+                        <ul>
+                            <li>气候数据可视化与趋势分析</li>
+                            <li>地质与遥感信息图设计</li>
+                            <li>科学传播与教育内容制作</li>
+                            <li>定制化数据仪表盘开发</li>
+                        </ul>
+                        <p style="margin-top:8px;color:var(--text-muted);">
+                            我们始终以 <strong style="color:var(--accent);">清晰 · 准确 · 美感</strong>
+                            为准则，为每一份数据找到最合适的表达方式。
+                        </p>
+                    </div>
+
+                    <div class="content-section" id="section-contact">
+                        <h2>📬 联系 <span class="accent">ESI</span></h2>
+                        <p>
+                            如果您有合作意向、项目需求，或只是想和我们聊聊地球科学，
+                            欢迎通过以下方式与我们取得联系。
+                        </p>
+                        <div class="contact-detail">
+                            <div class="row">
+                                <span class="label">📧 邮箱</span>
+                                <span class="value"><a href="#">esio2026@outlook.com</a></span>
+                            </div>
+                            <div class="row">
+                                <span class="label">🌐 网站</span>
+                                <span class="value"><a href="#">www.esi.earth</a></span>
+                            </div>
+                            <div class="row">
+                                <span class="label">📍 地址</span>
+                                <span class="value">中国 · 杭州 · 地球科学信息中心</span>
+                            </div>
+                            <div class="row" style="border-bottom:none;padding-bottom:4px;">
+                                <span class="label">🕐 响应</span>
+                                <span class="value">我们会在 24 小时内回复您</span>
+                            </div>
+                        </div>
+                        <p style="margin-top:16px;font-size:0.95rem;color:var(--text-light);">
+                            ✦ 也欢迎关注我们的社交媒体，获取最新动态。
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <!-- ===== 页脚 ===== -->
+    <footer class="footer">
+        <div class="container">
+            <div class="copyright">
+                &copy; 2026 <span>XBAOS</span> · 用 ❤️ 与数据
+            </div>
+            <div class="footer-links">
+                <a href="#">隐私政策</a>
+                <a href="#">使用条款</a>
+                <a href="#">GitHub</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ===== JavaScript ===== -->
+    <script>
+        (function() {
+            'use strict';
+
+            // ---------- DOM 引用 ----------
+            const navToggle = document.getElementById('navToggle');
+            const navMenu = document.getElementById('navMenu');
+            const navLinks = document.querySelectorAll('.nav-menu a');
+            const themeToggle = document.getElementById('themeToggle');
+            const sections = {
+                home: document.getElementById('section-home'),
+                about: document.getElementById('section-about'),
+                contact: document.getElementById('section-contact'),
+            };
+
+            let currentSection = 'home';
+
+            // ---------- 深色模式 ----------
+            const STORAGE_KEY = 'esi-theme';
+
+            function getPreferredTheme() {
+                const stored = localStorage.getItem(STORAGE_KEY);
+                if (stored === 'dark' || stored === 'light') return stored;
+                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+
+            function setTheme(theme) {
+                document.documentElement.setAttribute('data-theme', theme);
+                localStorage.setItem(STORAGE_KEY, theme);
+                themeToggle.setAttribute('aria-label', theme === 'dark' ? '切换到浅色模式' : '切换到深色模式');
+            }
+
+            function toggleTheme() {
+                const current = document.documentElement.getAttribute('data-theme');
+                const next = current === 'dark' ? 'light' : 'dark';
+                setTheme(next);
+            }
+
+            const initialTheme = getPreferredTheme();
+            setTheme(initialTheme);
+
+            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+            const handleSystemChange = (e) => {
+                if (!localStorage.getItem(STORAGE_KEY)) {
+                    setTheme(e.matches ? 'dark' : 'light');
+                }
+            };
+            mediaQuery.addEventListener('change', handleSystemChange);
+
+            themeToggle.addEventListener('click', toggleTheme);
+
+            // ---------- 移动端菜单 ----------
+            function toggleMobileMenu() {
+                const isOpen = navMenu.classList.toggle('open');
+                navToggle.setAttribute('aria-expanded', isOpen);
+            }
+
+            navToggle.addEventListener('click', toggleMobileMenu);
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    if (navMenu.classList.contains('open')) {
+                        navMenu.classList.remove('open');
+                        navToggle.setAttribute('aria-expanded', 'false');
+                    }
+                });
+            });
+
+            // ---------- 导航切换内容 ----------
+            function switchSection(sectionId) {
+                if (sectionId === currentSection) return;
+
+                Object.values(sections).forEach(el => {
+                    if (el) el.classList.remove('active');
+                });
+
+                const target = sections[sectionId];
+                if (target) {
+                    target.classList.add('active');
+                }
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    const dataSection = link.getAttribute('data-section');
+                    if (dataSection === sectionId) {
+                        link.classList.add('active');
+                    }
+                });
+
+                currentSection = sectionId;
+
+                const hero = document.getElementById('heroCard');
+                if (hero) {
+                    const rect = hero.getBoundingClientRect();
+                    if (rect.top < 0 || rect.top > window.innerHeight * 0.6) {
+                        hero.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }
+            }
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const section = this.getAttribute('data-section');
+                    if (section) {
+                        switchSection(section);
+                    }
+                });
+            });
+
+            const brand = document.querySelector('.nav-brand');
+            if (brand) {
+                brand.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    switchSection('home');
+                    if (navMenu.classList.contains('open')) {
+                        navMenu.classList.remove('open');
+                        navToggle.setAttribute('aria-expanded', 'false');
+                    }
+                });
+            }
+
+            let resizeTimer;
+            window.addEventListener('resize', function() {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => {
+                    if (window.innerWidth > 480 && navMenu.classList.contains('open')) {
+                        navMenu.classList.remove('open');
+                        navToggle.setAttribute('aria-expanded', 'false');
+                    }
+                }, 200);
+            });
+
+            switchSection('home');
+            console.log('✅ ESI 工作室页面已加载 (邮箱已更新)');
+        })();
+    </script>
+
+</body>
+</html>
